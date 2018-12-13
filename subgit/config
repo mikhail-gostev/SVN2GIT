@@ -1,0 +1,243 @@
+# This is SubGit configuration file.
+#
+# SubGit is a tool for instant and transparent SVN/Git synchronization.
+#
+# Please visit http://www.subgit.com/ for more information on SubGit,
+# new versions and online support.
+
+# 
+# General options
+# 
+[core]
+	# When core.shared is set to 'true', all files will be made group-writable.
+	#
+	# You MUST set this option to 'true' when more than one system account is used
+	# to work with this repository (e.g. Apache for Subversion and SSH for Git).
+	# All these accounts MUST then share the same primary group.
+	shared = false
+
+	# Path to the directory where logs are stored.
+	logs = subgit/logs
+
+	# Path to the authors mapping file or authors mapping helper program.
+	#
+	# There could be one or more authorsFile options specified. Options are processed
+	# from the last to the first one specifed, until mapping is obtained.
+	#
+	# Option value could be one of the following:
+	#
+	#        text file with explicit authors mapping in git-svn format,
+	#        that is described at 'http://www.kernel.org/pub/software/scm/git/docs/git-svn.html'
+	#     OR
+	#        path to an executable authors mapping helper program and its optional arguments;
+	#        authors mapping helper program is expected to read data from the standard input
+	#        and to provide output to the standard output. Input/output format is:
+	#
+	#        for Git to Subversion mapping:
+	#               INPUT:
+	#                FULL AUTHOR NAME
+	#                AUTHOR EMAIL
+	#               OUTPUT:
+	#                SUBVERSION USER NAME
+	#
+	#        for Subversion to Git mapping:
+	#               INPUT:
+	#                SUBVERSION USER NAME
+	#               OUTPUT:
+	#                FULL AUTHOR NAME
+	#                AUTHOR EMAIL
+	#
+	#        Sample authors mapping script could be found in 'subgit/samples' directory.
+	#
+	# When no authorsFile option is specified, automatically generated mapping will be used.
+	authorsFile = subgit/authors.txt
+
+	# Domain to be used to generate Git committer email when authors mapping
+	# is not defined or does not provide email address for a particular committer.
+	defaultDomain = localhost
+
+	# Encoding to be used to store paths in Git tree objects.
+	pathEncoding = UTF-8
+
+# 
+# Subversion to Git mapping options
+# 
+[svn]
+	# Subversion repository URL
+	url = svn://mikhailg@source2010.engineering.clearswift.org/gateways
+
+	# Options below (trunk, branches, tags, shelves) define correspondece between Subversion
+	# directories and Git references. Depending on the actual Subversion project layout and whether
+	# all or only some of the branches have to be mirrored, these options might need to be adjusted.
+	#
+	#  Generic mapping syntax is:
+	#    <Subversion-Path-Pattern>:<Git-Reference-Pattern>
+	#
+	#  Subversion paths are relative to the URL defined by the svn.url option.
+	#
+	#  Wildcard mappings:
+	#    Use wildcard branches and tags mappings to define correspondence between set of Subversion
+	#    directories that represent branches or tags and corresponding Git references:
+	#
+	#    branches = branches/*:refs/heads/*
+	#    branches = branches/*/*:refs/heads/*/*
+	#    branches = branches/*/project:refs/heads/*
+	#    branches = branches/feature_*_2015:refs/heads/features/*
+	#
+	#    Wildcard related mapping syntax rules:
+	#
+	#    - Each mapping could include zero or more '*' on both sides (sides are separated by ':') of the definition.
+	#    - Each path or namespace segment should contain no more than one '*'.
+	#    - Number of '*' on the left side of the mapping must be equal to the number of '*' on the right side of it.
+	#
+	#  Explicit mappings:
+	#    Use explicit mapping for the Subversion directory that represents trunk and optionally for
+	#    individual branches or tags:
+	#
+	#    trunk = trunk:refs/heads/master
+	#    branches = branches/1.0.x:refs/heads/1.0.x
+	#    tags = tags/1.0.1:refs/tags/1.0.1
+	#
+	#  Shelves:
+	#    Shelves are special branches SubGit creates in Subversion repository to mirror Git anonymous
+	#    branches to. Shelves mapping is optional, when unspecified anonymous Git branches will not
+	#    be mirrored. shelves option defines location for those special branches:
+	#
+	#    shelves = shelves/*:refs/shelves/*
+	#
+	#  Excluding branches, tags and paths from translaiton:
+	#     Mappings could be refined by specifying patterns that controls what branches and tags
+	#     are excluded from the translation.
+	#
+	#     excludeBranches = SIMPLE_PATTERN
+	#
+	#     Value of excludeBranches option is simple path matching pattern, with zero or one '*' symbol.
+	#     Branch path relative to the Subversion project URL is matched against the pattern specified.
+	#
+	#     To include or exclude particular files or directories within any of the branches or tags,
+	#     use the following options:
+	#
+	#     excludePath = PATTERN
+	#     includePath = PATTERN
+	#
+	#     Value of excludePath and includePath options is a pattern in format same to that used in .gitignore file.
+	#     Only non-recursive patterns are supported by includePath option (pattern should start with '/').
+	#     Paths being matched against the patterns are relative to the branch or tag path.
+	#     See 'http://git-scm.com/docs/gitignore' for complete documentation on the pattern format.
+	#
+	#     When branches, tags or paths are excluded from the translation with the help of one of the above options,
+	#     modifications to those branches or paths made in Subversion project would not be translated to Git,
+	#     as well as changes in Git repository made to those locations would not appear in Subversion.
+	#
+	# SubGit supports mirroring of Subversion projects that have no branches. To configure mirror
+	# for such project do the following:
+	#
+	#    a) Define no mapping (no trunk, branches, tags and shelves options), and
+	#       make sure that svn.url option value refers to the project root folder
+	#       in Subversion repository;
+	#    b) optionally set trunk = :refs/heads/referenceName to override default Git branch name.
+	#
+	# Paths in mappings are case-sensitive, i.e. trunk and Trunk are considered to be
+	# different paths.
+	#
+	# Once defines, mapping could be extended (e.g. new branches could be added), but changes that
+	# leave existing branches unmapped are not accepted.
+	#
+	# Mapping suggested by default reflects recommended Subversion project layout as described
+	# at 'http://svnbook.red-bean.com/en/1.7/svn.tour.importing.html#svn.tour.importing.layout'
+
+trunk = trunk:refs/heads/master
+branches = branches/release/*:refs/heads/svn/release/*
+branches = branches/dev/WebAtsHttps1:refs/heads/svn/dev/WebAtsHttps1
+branches = branches/ert/Email421:refs/heads/svn/ert/Email421
+branches = branches/archive/ert/421/Email421:refs/heads/svn/ert/Email421arch
+branches = branches/dev/devtoolset-7_gateways:refs/heads/svn/dev/devtoolset-7
+branches = branches/dev/engine1811:refs/heads/svn/dev/engine1811
+branches = branches/dev/keycloak_p1:refs/heads/svn/dev/keycloak_p1
+branches = branches/dev/tdt-inbound_tls_logging:refs/heads/svn/dev/tdt-inbound_tls_logging
+branches = branches/dev/tdt-outbound_tls_logging:refs/heads/svn/dev/tdt-outbound_tls_logging
+branches = branches/ert/gw-ert-custard-5:refs/heads/svn/ert/gw-ert-custard-5
+tags = tags/*/*/RTM:refs/tags/svn/*/*/RTM
+tags = tags/tags/*/4.4.0/RTM:refs/tags/svn/*/4.4.0/RTM-TMP
+tags = tags/*/4.8.0/RTM/4.8.0:refs/tags/svn/*/4.8.0/RTM
+excludeTags=tags/*/4.8.0/RTM
+
+	# Interval between checks for new changes in Subversion repository in seconds.
+	fetchInterval = 60
+
+	# Subversion connection establishment timeout in seconds.
+	connectTimeout = 300
+
+	# Subversion connection read timeout in seconds.
+	readTimeout = 600
+
+	# enable HTTP requests spooling to prevent server-side timeout when request processing takes long time. 
+	httpSpooling = false
+
+	# When 'git.keepGitCommitTime' is set to 'true', SVN commits will have the same dates
+	# as corresponding Git commits, even if this violates monotonic increase of commit dates from revision to revision.
+	# As a side effect some features that rely on dates order like 'revision dates' may work incorrectly
+	# (see 'http://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html' for 'revision dates' feature explanation).
+	#
+	# When 'git.keepGitCommitTime' is set to false, SubGit will try to preserve Git commit dates while translation to SVN,
+	# as it is possible, but it will guarantee SVN dates to increase monotonically from revision to revision.
+	keepGitCommitTime = false
+
+	# Comma-separated list of [auth] sections ids where Subversion credentials are defined.
+	# Credentials will be used both for read-only and write operations, and it is recommended to
+	# define credentials of an account that has full access to the Subversion repository.
+	auth = default
+
+# 
+# Subversion authentication options.
+# Valid options in this section are:
+#
+#    passwords: path to the file that contains user/password pairs;
+#
+#    credentialHelper: path to the credential helper program and its optional arguments;
+#                      program is expected to be non-interactive (no prompt) and
+#                      to use Git credential helper input/output format;
+#                      refer to 'https://www.kernel.org/pub/software/scm/git/docs/git-credential.html#IOFMT' for more details;
+#
+#                      Sample credential helper script could be found in 'subgit/samples' directory.
+#
+#    userName: user name to use to log into Subversion repository;
+#
+#    password: password to use with the explicitly specified user name;
+#
+#    sshKeyFile: for svn+ssh protocol, SSH private key to use; OpenSSH format is supported;
+#    sshKeyFilePassphrase: passphrase to use to read SSH private key;
+#
+#    sslClientCertFile: for SSL protocol, client SSL client certificate to use; PKSC#12 format is supported;
+#    sslClientCertPassphrase: passphrase to use to read SSL client certificate;
+#
+#    subversionConfigurationDirectory: path to Subversion configuration directory or '@default@' to use
+#                                      current user Subversion configuration and credentials cache.
+# 
+[auth "default"]
+	# Passwords file path. Passwords file contains user name/password pairs that should be
+	# used to log into Subversion repository.  
+	passwords = subgit/passwd
+	useDefaultSubversionConfigurationDirectory = false
+	subversionConfigurationDirectory = /home/mike/.subversion
+
+# 
+# Options specific to the background translation process.
+# 
+[daemon]
+	# Pid file path.
+	pidFile = subgit/daemon.pid
+
+	# Timeout in seconds; background translation process exits
+	# after being idle for the specified amount of seconds.
+	#
+	# 0 seconds timeout means that translation process exits immediately.
+	#
+	# Larger timeout values may improve translation performance by reducing
+	# translation process startup overhead.
+	idleTimeout = infinity
+
+	# Explicit translation process classpath or path to the directory
+	# that contains jars that have to be on the process classpath.
+	classpath = subgit/lib
+
